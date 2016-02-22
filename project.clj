@@ -1,4 +1,4 @@
-(defproject logdog "0.1.0"
+(defproject com.guaranteedrate/logdog "0.1.0"
   :description "Library for simplified logging, timing, and metrics collection"
   :url "http://github.com/Guaranteed-Rate/logdog"
   :license {:name "Eclipse Public License"
