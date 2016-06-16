@@ -1,4 +1,4 @@
-(defproject com.guaranteedrate/logdog "0.1.0"
+(defproject com.guaranteedrate/logdog "0.2.0"
   :description "Library for simplified logging, timing, and metrics collection"
   :url "http://github.com/Guaranteed-Rate/logdog"
   :license {:name "Eclipse Public License"
@@ -16,6 +16,10 @@
                  ;; metrics and DataDog tools
                  [io.dropwizard.metrics/metrics-core "3.1.0" :exclusions [org.slf4j/slf4j-api]]
                  [org.coursera/dropwizard-metrics-datadog "1.0.2" :exclusions [com.fasterxml.jackson.core/jackson-databind
-                                                                               org.slf4j/slf4j-api]]]
+                                                                               org.slf4j/slf4j-api]]
+                 ;; JSON parsing library
+                 [cheshire "5.5.0"]
+                 ;; nice HTTP client library
+                 [clj-http "2.0.0"]]
   :aot [clojure.tools.logging.impl logdog.main]
   :main logdog.main)
