@@ -68,3 +68,19 @@ marks are turned to underscores and shipped. It's inconvenient, but those are
 the limitations of Datadog.
 
 The installation and configuration of the Datadog agent is [here](http://docs.datadoghq.com/guides/basic_agent_usage/).
+
+# logdog - Automatic Session Id Tracking
+
+To be written ... 
+
+## Usage
+
+Add the necessary dependency to your project:
+```clojure
+[com.guaranteedrate/logdog "0.2.0"]
+```
+
+## Basic Usage
+
+## Details
+
