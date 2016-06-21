@@ -71,16 +71,90 @@ The installation and configuration of the Datadog agent is [here](http://docs.da
 
 # logdog - Automatic Session Id Tracking
 
-To be written ... 
-
-## Usage
+## Setup
 
 Add the necessary dependency to your project:
 ```clojure
 [com.guaranteedrate/logdog "0.2.0"]
 ```
 
-## Basic Usage
+In your `log4j.properties` file use `%X{sess-id}` and `%X{req-id}` in your `ConversionPattern`.
 
-## Details
+Example:
+```
+log4j.appender.C1.layout.ConversionPattern=[%d{yyyy-MM-dd HH:mm:ss.SSS}:%t:%X{sess-id}/%X{req-id}] %-5p %c - %m%n
+```
 
+
+## Usage
+
+### Service definition
+
+Set up the `wrap-logging` middleware in your Ring/Compojure service route definitions.
+
+```clojure
+(ns my-ns.server
+  (:require [clojure.tools.logging :refer [infof warn warnf error errorf]]
+            [compojure
+             [core :refer [defroutes POST]]]
+            [logdog.middleware :refer [wrap-logging]]))
+
+(defroutes app-routes
+  (POST "/my/service" [:as {body :body}]
+    ;; process body
+    ))
+
+(def app
+  "The actual ring handler that is run -- this is the routes above
+   wrapped in various middlewares."
+  (-> app-routes
+      ;; ...
+      ;; other middleware
+      ;; ...
+      wrap-logging))
+```
+
+### Calling other services
+
+Use the `logdog.client` namespace to call services.
+
+```clojure
+(ns my-ns.core
+  (:require [clj-http.conn-mgr :as conn]
+            [clojure.tools.logging :refer [infof warn warnf error errorf]]
+            [logdog.client :refer [do-post*]]))
+
+(defonce cm (conn/make-reusable-conn-manager {:timeout 120
+                                              :threads 20
+                                              :default-per-route 6}))
+
+(defn service-call
+  [data]
+  (if (map? data)
+    (let [ep "https://my.endpoint.com"
+          resp (do-post* cm ep data)]
+      (if resp
+        {:status "OK" :body (if (= "null" resp) nil resp)}
+        {:status "Error"}))))
+
+```
+
+If you want to overtly set a session-id and request-id then set the header in your request.
+You can do this by passing a map as the 4th argument to the do-post* call.
+
+Ex.
+```clojure
+(do-post* cm ep data {:headers {:x-session-id "klaatu-barada-nikto" :x-request-id 1}})
+```
+
+Ex. (JavaScript)
+```javascript
+  $.ajaxSetup({
+    beforeSend: function (xhr)
+    {
+      xhr.setRequestHeader("x-session-id", "thx-1138");
+      xhr.setRequestHeader("x-request-id", 1);
+    }
+  });
+
+```
